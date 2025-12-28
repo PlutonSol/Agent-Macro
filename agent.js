@@ -1,35 +1,65 @@
-name: Agent Macro Auto
+import OpenAI from "openai";
+import fs from "fs";
 
-# Déclenchement toutes les heures
-on:
-  schedule:
-    - cron: '0 * * * *' # toutes les heures
-  workflow_dispatch:    # permet de lancer manuellement
+// Crée un client OpenAI avec la clé de GitHub Actions
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
-jobs:
-  run-agent:
-    runs-on: ubuntu-latest
+export async function analyze(news) {
+  try {
+    const response = await client.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: [
+        {
+          role: "system",
+          content: `
+Tu es un analyste macro-financier pédagogique.
+Tu analyses l’actualité macro US, métaux et crypto.
+Tu ne donnes aucun conseil d’investissement.
+Tu écris en français clair.
+          `
+        },
+        {
+          role: "user",
+          content: news
+        }
+      ]
+    });
 
-    steps:
-      # 1️⃣ Récupérer le code du repo
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Erreur IA :", error);
+    return "Impossible de générer l'analyse pour le moment.";
+  }
+}
 
-      # 2️⃣ Installer Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+// Optionnel : générer le fichier analysis.json localement
+export async function generateAnalysis() {
+  const fakeNews = `
+Macro US : discussions sur les taux et l’inflation.
+Métaux : évolution de l’or et du cuivre.
+Crypto : actualité régulation et sentiment de marché.
+  `;
 
-      # 3️⃣ Installer les dépendances
-      - name: Install dependencies
-        run: npm install openai
+  const result = await analyze(fakeNews);
 
-      # 4️⃣ Lancer l'agent
-      - name: Run Agent
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          node agent.js
+  fs.writeFileSync(
+    "analysis.json",
+    JSON.stringify(
+      {
+        date: new Date().toISOString(),
+        content: result
+      },
+      null,
+      2
+    )
+  );
 
-   
+  console.log("✅ analysis.json généré avec succès !");
+}
+
+// Si on lance directement node agent.js
+if (import.meta.url === `file://${process.argv[1]}`) {
+  generateAnalysis();
+}
