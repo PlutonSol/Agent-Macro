@@ -8,7 +8,6 @@ const client = new OpenAI({
 
 export async function analyze(news) {
   try {
-    // Envoie le texte à l'IA
     const response = await client.chat.completions.create({
       model: "gpt-4.1-mini",
       messages: [
