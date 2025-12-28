@@ -1,0 +1,35 @@
+name: Agent Macro Auto
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le repo
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Installer dépendances
+        run: npm install openai
+
+      - name: Lancer l’agent
+        run: node run.js
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit des résultats
+        run: |
+          git config user.name "agent-ia"
+          git config user.email "agent@github.com"
+          git add analysis.json
+          git commit -m "Update analysis"
+          git push
