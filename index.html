@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Analyse Macro Automatique</title>
+</head>
+<body>
+  <h1>Analyse Macro – Mise à jour horaire</h1>
+  <p id="date"></p>
+  <pre id="analysis">Chargement...</pre>
+
+  <script>
+    fetch("analysis.json")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("date").innerText =
+          "Dernière mise à jour : " + new Date(data.date).toLocaleString();
+        document.getElementById("analysis").innerText = data.content;
+      });
+  </script>
+</body>
+</html>
