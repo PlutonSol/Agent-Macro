@@ -26,10 +26,10 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - name: Commit des résultats
-        run: |
-          git config user.name "agent-ia"
-          git config user.email "agent@github.com"
-          git add analysis.json
-          git commit -m "Update analysis"
-          git push
+        #- name: Commit des résultats
+        #run: |
+         # git config user.name "agent-ia"
+          #git config user.email "agent@github.com"
+          #git add analysis.json
+          #git commit -m "Update analysis"
+          #git push
