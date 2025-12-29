@@ -34,7 +34,7 @@ Tu écris en français clair.
   }
 }
 
-// Optionnel : générer le fichier analysis.json localement
+// Génère le fichier analysis.json et affiche le contenu
 export async function generateAnalysis() {
   const fakeNews = `
 Macro US : discussions sur les taux et l’inflation.
@@ -44,22 +44,21 @@ Crypto : actualité régulation et sentiment de marché.
 
   const result = await analyze(fakeNews);
 
-  fs.writeFileSync(
-    "analysis.json",
-    JSON.stringify(
-      {
-        date: new Date().toISOString(),
-        content: result
-      },
-      null,
-      2
-    )
-  );
+  const analysisData = {
+    date: new Date().toISOString(),
+    content: result
+  };
 
+  // Écrire le fichier pour usage local
+  fs.writeFileSync("analysis.json", JSON.stringify(analysisData, null, 2));
+
+  // Afficher le contenu dans les logs GitHub Actions
   console.log("✅ analysis.json généré avec succès !");
+  console.log("----- Contenu pour copier -----");
+  console.log(JSON.stringify(analysisData, null, 2));
+  console.log("----- Fin du contenu -----");
 }
 
 // Si on lance directement node agent.js
 if (import.meta.url === `file://${process.argv[1]}`) {
-  generateAnalysis();
-}
+
